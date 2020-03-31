@@ -4,6 +4,9 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { IUbs } from './IUbs';
 import _ from 'lodash';
 
+//const HOST = 'http://localhost:8080';
+const HOST = 'https://ubs-microservice.herokuapp.com';
+
 type State = {
   center: {
     lat: number;
@@ -46,7 +49,7 @@ export default class OpenStreetMaps extends Component<{}, State> {
   };
   mapRef = createRef<Map>();
   centerRef = createRef<Marker>();
-  
+
   componentDidMount() {
     this.load();
   }
@@ -139,14 +142,19 @@ export default class OpenStreetMaps extends Component<{}, State> {
   }
 
   private loadUbs(lat: number, lng: number, distance: number = 10) {
-    const url = `http://localhost:8080/api/v1/ubs?query=${lat},${lng},${distance}&page=0&size=1000`;
+    const url = `${HOST}/api/v1/ubs?query=${lat},${lng},${distance}&page=0&size=1000`;
     fetch(url)
       .then(res => res.json())
       .then(data => {
         const _ubsList = data._embedded.ubsDtoes;
         _ubsList.forEach((_ubs: any) => {
           const ubs: IUbs = _ubs.content;
-          if (_.findIndex(this.state.ubsList, (_ubs : IUbs) => _ubs.id === ubs.id) < 0) {            
+          if (
+            _.findIndex(
+              this.state.ubsList,
+              (_ubs: IUbs) => _ubs.id === ubs.id
+            ) < 0
+          ) {
             this.setState({
               ubsList: [
                 ...this.state.ubsList,
