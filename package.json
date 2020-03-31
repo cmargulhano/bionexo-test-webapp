@@ -2,9 +2,6 @@
   "name": "ubs-webapp",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": "13.11.0"
-  },
   "dependencies": {
     "@babel/core": "7.9.0",
     "@svgr/webpack": "4.3.3",
