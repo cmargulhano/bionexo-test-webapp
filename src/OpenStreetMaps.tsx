@@ -1,8 +1,8 @@
 import { Icon } from 'leaflet';
+import _ from 'lodash';
 import React, { Component, createRef } from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { IUbs } from './IUbs';
-import _ from 'lodash';
 
 //const HOST = 'http://localhost:8080';
 const HOST = 'https://ubs-microservice.herokuapp.com';
@@ -44,7 +44,7 @@ export default class OpenStreetMaps extends Component<{}, State> {
       lat: 0,
       lng: 0
     },
-    zoom: 0,
+    zoom: 13,
     ubsList: []
   };
   mapRef = createRef<Map>();
@@ -59,8 +59,10 @@ export default class OpenStreetMaps extends Component<{}, State> {
     const marker = this.centerRef.current;
     if (marker != null) {
       const center = marker.leafletElement.getLatLng();
+      const zoom = this.mapRef.current?.leafletElement.getZoom() as number;
       this.setState({
-        center: center
+        center: center,
+        zoom: zoom
       });
       this.loadUbs(center.lat, center.lng);
     }
@@ -76,6 +78,9 @@ export default class OpenStreetMaps extends Component<{}, State> {
       >
         <Popup>
           <br /> Nome: {ubs.name}
+          <br /> Endereço: {ubs.address}
+          <br /> Cidade: {ubs.city}
+          <br /> Telefone: {ubs.phone}
           <br /> Latitude: {ubs.geocode.latitude}
           <br /> Longitude: {ubs.geocode.longitude}
         </Popup>
@@ -119,25 +124,25 @@ export default class OpenStreetMaps extends Component<{}, State> {
 
   private load() {
     const geo = navigator.geolocation;
-    const onChange = (coords: any) => {
-      const lat = coords.coords.latitude;
-      const lng = coords.coords.longitude;
-      this.setState({
-        center: { lat: lat, lng: lng },
-        zoom: 13
-      });
-      this.loadUbs(lat, lng);
-    };
-    const onError = (error: any) => {
-      console.error(error.message);
-    };
-    const settings = {
-      enableHighAccuracy: false,
-      timeout: Infinity,
-      maximumAge: 0
-    };
     if (geo) {
-      geo.getCurrentPosition(onChange, onError, settings);
+      geo.getCurrentPosition(
+        (coords: any) => {
+          const lat = coords.coords.latitude;
+          const lng = coords.coords.longitude;
+          this.setState({
+            center: { lat: lat, lng: lng }
+          });
+          this.loadUbs(lat, lng);
+        },
+        (error: any) => {
+          console.error(error.message);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: Infinity,
+          maximumAge: 0
+        }
+      );
     }
   }
 
@@ -146,31 +151,39 @@ export default class OpenStreetMaps extends Component<{}, State> {
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        const _ubsList = data._embedded.ubsDtoes;
-        _ubsList.forEach((_ubs: any) => {
-          const ubs: IUbs = _ubs.content;
-          if (
-            _.findIndex(
-              this.state.ubsList,
-              (_ubs: IUbs) => _ubs.id === ubs.id
-            ) < 0
-          ) {
-            this.setState({
-              ubsList: [
-                ...this.state.ubsList,
-                {
-                  id: ubs.id,
-                  name: ubs.name,
-                  geocode: {
-                    latitude: ubs.geocode.latitude,
-                    longitude: ubs.geocode.longitude
-                  }
-                }
-              ]
-            });
-          }
-        });
+        this.addUbsList(data);
       })
       .catch(console.log);
+  }
+
+  private addUbsList(data: any) {
+    const _ubsList = data._embedded.ubsDtoes;
+    _ubsList.forEach((_ubs: any) => {
+      const ubs: IUbs = _ubs.content;
+      this.addUbs(ubs);
+    });
+  }
+
+  private addUbs(ubs: IUbs) {
+    if (
+      _.findIndex(this.state.ubsList, (_ubs: IUbs) => _ubs.id === ubs.id) < 0
+    ) {
+      this.setState({
+        ubsList: [
+          ...this.state.ubsList,
+          {
+            id: ubs.id,
+            name: ubs.name,
+            address: ubs.address,
+            city: ubs.city,
+            phone: ubs.phone,
+            geocode: {
+              latitude: ubs.geocode.latitude,
+              longitude: ubs.geocode.longitude
+            }
+          }
+        ]
+      });
+    }
   }
 }
