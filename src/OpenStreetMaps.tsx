@@ -1,10 +1,9 @@
-import { Icon } from 'leaflet';
 import _ from 'lodash';
 import React, { Component, createRef } from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { IUbs } from './IUbs';
+import { ubsIcon, pointerIcon } from './MapsIcons';
 
-//const HOST = 'http://localhost:8080';
 const HOST = 'https://ubs-microservice.herokuapp.com';
 
 type State = {
@@ -16,28 +15,10 @@ type State = {
   ubsList: IUbs[];
 };
 
-export const pointerIcon = new Icon({
-  iconUrl: '/pointerIcon.svg',
-  iconRetinaUrl: '/pointerIcon.svg',
-  iconAnchor: [5, 55],
-  popupAnchor: [10, -44],
-  iconSize: [25, 55],
-  shadowUrl: '/marker-shadow.png',
-  shadowSize: [68, 95],
-  shadowAnchor: [20, 92]
-});
-
-export const ubsIcon = new Icon({
-  iconUrl: '/hospital.svg',
-  iconRetinaUrl: '/hospital.svg',
-  iconAnchor: [10, 50],
-  popupAnchor: [10, -44],
-  iconSize: [40, 40],
-  shadowUrl: '/marker-shadow.png',
-  shadowSize: [68, 95],
-  shadowAnchor: [20, 92]
-});
-
+/**
+ * OPenmComponent
+ * @author Cláudio Margulhano
+ */
 export default class OpenStreetMaps extends Component<{}, State> {
   state = {
     center: {
@@ -54,6 +35,26 @@ export default class OpenStreetMaps extends Component<{}, State> {
     this.load();
   }
 
+  render() {
+    return (
+      <Map
+        ref={this.mapRef}
+        center={[this.state.center.lat, this.state.center.lng]}
+        zoom={this.state.zoom}
+      >
+        <TileLayer
+          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {this.addMarkers()}
+      </Map>
+    );
+  }
+
+  /**
+   * Updates current position
+   */
   updatePosition = () => {
     console.log(this.centerRef.current?.props.position);
     const marker = this.centerRef.current;
@@ -68,6 +69,11 @@ export default class OpenStreetMaps extends Component<{}, State> {
     }
   };
 
+  /**
+   * Add markers:
+   *   - current location
+   *   - All UBS locations
+   */
   private addMarkers() {
     const { ubsList } = this.state;
     const list = ubsList.map((ubs: IUbs) => (
@@ -105,23 +111,9 @@ export default class OpenStreetMaps extends Component<{}, State> {
     return list;
   }
 
-  render() {
-    return (
-      <Map
-        ref={this.mapRef}
-        center={[this.state.center.lat, this.state.center.lng]}
-        zoom={this.state.zoom}
-      >
-        <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {this.addMarkers()}
-      </Map>
-    );
-  }
-
+  /**
+   * Load UBS from current location
+   */
   private load() {
     const geo = navigator.geolocation;
     if (geo) {
@@ -146,8 +138,14 @@ export default class OpenStreetMaps extends Component<{}, State> {
     }
   }
 
+  /**
+   * Fetch UBS list
+   * @param lat latitude
+   * @param lng longitude
+   * @param distance distance in kilometers, default is 10Km
+   */
   private loadUbs(lat: number, lng: number, distance: number = 10) {
-    const url = `${HOST}/api/v1/ubs?query=${lat},${lng},${distance}&page=0&size=1000`;
+    const url = `${HOST}/api/v1/ubs?query=${lat},${lng},${distance}&page=0&size=9999`;
     fetch(url)
       .then(res => res.json())
       .then(data => {
@@ -156,6 +154,11 @@ export default class OpenStreetMaps extends Component<{}, State> {
       .catch(console.log);
   }
 
+  /**
+   * Append UBS list from current location
+   *
+   * @param data json response
+   */
   private addUbsList(data: any) {
     const _ubsList = data._embedded.ubsDtoes;
     _ubsList.forEach((_ubs: any) => {
@@ -164,6 +167,11 @@ export default class OpenStreetMaps extends Component<{}, State> {
     });
   }
 
+  /**
+   * Adds UBS in list, if not exists
+   * 
+   * @param ubs UBS
+   */
   private addUbs(ubs: IUbs) {
     if (
       _.findIndex(this.state.ubsList, (_ubs: IUbs) => _ubs.id === ubs.id) < 0
