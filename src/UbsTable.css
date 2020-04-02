@@ -1,0 +1,12 @@
+.MuiPaper-rounded {
+    z-index: 999;  
+    position: absolute !important;  
+    right: 0;  
+    top: 0;
+    width: 32vw;
+    margin: 20px;
+}
+
+.MTableToolbar-title-37 {
+    overflow: unset !important;   
+}

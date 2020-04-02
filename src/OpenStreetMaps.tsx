@@ -1,23 +1,27 @@
+import { Backdrop, CircularProgress } from '@material-ui/core';
 import _ from 'lodash';
-import React, { Component, createRef } from 'react';
+import React, { Component, createRef, Fragment } from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { IUbs } from './IUbs';
-import { ubsIcon, pointerIcon } from './MapsIcons';
+import { pointerIcon, ubsIcon } from './MapsIcons';
+import UbsTable from './UbsTable';
+import './OpenStreetMaps.css';
 
 //const HOST = 'https://ubs-microservice.herokuapp.com';
 const HOST = 'http://localhost:8080';
 
 type State = {
   center: {
-    lat: number;
-    lng: number;
+    lat?: number;
+    lng?: number;
   };
   zoom: number;
   ubsList: IUbs[];
+  showProgress: boolean;
 };
 
 /**
- * OPenmComponent
+ * OpenStreet Maps Component
  * @author Cláudio Margulhano
  */
 export default class OpenStreetMaps extends Component<{}, State> {
@@ -27,10 +31,12 @@ export default class OpenStreetMaps extends Component<{}, State> {
       lng: 0
     },
     zoom: 13,
-    ubsList: []
+    ubsList: [],
+    showProgress: false
   };
   mapRef = createRef<Map>();
   centerRef = createRef<Marker>();
+  ubsTable = createRef<UbsTable>();
 
   componentDidMount() {
     this.load();
@@ -38,20 +44,49 @@ export default class OpenStreetMaps extends Component<{}, State> {
 
   render() {
     return (
-      <Map
-        ref={this.mapRef}
-        center={[this.state.center.lat, this.state.center.lng]}
-        zoom={this.state.zoom}
-      >
-        <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <Fragment>
+        <Backdrop
+          className="backdrop"
+          open={this.state.showProgress}
+          onClick={this.handleClose}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <UbsTable ref={this.ubsTable} onSelectUbs={this.setCenter} />
+        <Map
+          ref={this.mapRef}
+          center={[this.state.center.lat, this.state.center.lng]}
+          zoom={this.state.zoom}
+        >
+          <TileLayer
+            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
 
-        {this.addMarkers()}
-      </Map>
+          {this.addMarkers()}
+        </Map>
+      </Fragment>
     );
   }
+
+  handleClose = () => {
+    this.setState({ showProgress: false });
+  };
+
+  setCenter = (id: string) => {
+    const ubs = _.find(
+      this.state.ubsList,
+      (_ubs: IUbs) => _ubs.id === id
+    ) as IUbs;
+    this.setState({
+      center: { lat: ubs?.geocode.latitude, lng: ubs?.geocode.longitude }
+    });
+    this.centerRef.current?.setState({
+      lat: ubs?.geocode.latitude,
+      lng: ubs?.geocode.longitude
+    });
+    this.loadUbs(ubs?.geocode.latitude, ubs?.geocode.longitude);
+  };
 
   /**
    * Updates current position
@@ -146,11 +181,13 @@ export default class OpenStreetMaps extends Component<{}, State> {
    * @param distance distance in kilometers, default is 10Km
    */
   private loadUbs(lat: number, lng: number, distance: number = 10) {
+    this.setState({ showProgress: true });
     const url = `${HOST}/api/v1/ubs?query=${lat},${lng},${distance}&page=0&size=9999`;
     fetch(url)
       .then(res => res.json())
       .then(data => {
         this.addUbsList(data);
+        this.setState({ showProgress: false });
       })
       .catch(console.log);
   }
@@ -170,7 +207,7 @@ export default class OpenStreetMaps extends Component<{}, State> {
 
   /**
    * Adds UBS in list, if not exists
-   * 
+   *
    * @param ubs UBS
    */
   private addUbs(ubs: IUbs) {
@@ -193,6 +230,9 @@ export default class OpenStreetMaps extends Component<{}, State> {
           }
         ]
       });
+      setTimeout(() => {
+        this.ubsTable.current?.setState({ data: this.state.ubsList });
+      }, 100);
     }
   }
 }

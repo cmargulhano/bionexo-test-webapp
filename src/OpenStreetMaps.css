@@ -1,0 +1,13 @@
+.leaflet-container {
+  width: 100%;
+  height: 100vh;
+}
+
+.leaflet-marker-draggable {
+  z-index: 100000 !important;
+}
+
+.backdrop {
+  color: '#fff';
+  z-index: 100000 !important;
+}
