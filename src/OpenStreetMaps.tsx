@@ -4,7 +4,8 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { IUbs } from './IUbs';
 import { ubsIcon, pointerIcon } from './MapsIcons';
 
-const HOST = 'https://ubs-microservice.herokuapp.com';
+//const HOST = 'https://ubs-microservice.herokuapp.com';
+const HOST = 'http://localhost:8080';
 
 type State = {
   center: {
