@@ -14,4 +14,4 @@ npm run start
 https://ubs-webapp.herokuapp.com/
 
 
-![alt text] (https://github.com/cmargulhano/bionexo-test-webapp/blob/master/public/print_screen.png)
+![alt text](https://github.com/cmargulhano/bionexo-test-webapp/blob/master/public/print_screen.png)
