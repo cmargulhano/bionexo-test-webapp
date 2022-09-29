@@ -1,0 +1,64 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - '@testing-library/jest-dom > lodash':
+        patched: '2022-09-29T19:10:17.549Z'
+    - eslint > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - eslint-plugin-flowtype > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - html-webpack-plugin > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - react-google-maps > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - webpack-manifest-plugin > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - '@typescript-eslint/parser > @typescript-eslint/typescript-estree > lodash':
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-eslint > @babel/traverse > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-preset-react-app > @babel/core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - eslint > inquirer > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - eslint > table > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - optimize-css-assets-webpack-plugin > last-call-webpack-plugin > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - react-dev-utils > inquirer > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - webpack-dev-server > http-proxy-middleware > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - '@typescript-eslint/eslint-plugin > @typescript-eslint/experimental-utils > @typescript-eslint/typescript-estree > lodash':
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-preset-react-app > @babel/preset-env > @babel/plugin-transform-block-scoping > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-jest > @jest/transform > @babel/core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-eslint > @babel/traverse > @babel/generator > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - webpack-dev-server > portfinder > async > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-jest > @jest/transform > @babel/core > @babel/helper-module-transforms > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest-environment-jsdom-fourteen > @jest/environment > @jest/transform > @babel/core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest > jest-cli > jest-config > @babel/core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - '@svgr/webpack > @babel/preset-env > @babel/plugin-transform-classes > @babel/helper-define-map > lodash':
+        patched: '2022-09-29T19:10:17.549Z'
+    - babel-preset-react-app > @babel/preset-env > @babel/plugin-transform-classes > @babel/helper-define-map > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest-environment-jsdom-fourteen > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest-environment-jsdom-fourteen > @jest/environment > @jest/transform > @babel/core > @babel/helper-module-transforms > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest > jest-cli > jest-config > @babel/core > @babel/helper-module-transforms > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
+    - jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2022-09-29T19:10:17.549Z'
